@@ -2,13 +2,33 @@
  * References API and code from https://github.com/niklasvieth/polestar-ios-medium-widget
  */
 
+/** Set Variables */
+const HYUNDAI_BLUELINK_EMAIL: string = '';
+const HYUNDAI_BLUELINK_PASSWORD: string = '';
+const HYUNDAI_BLUELINK_ACCESS_PIN: string = '';
+const HYUNDAI_BLUELINK_VIN: string = '';
+
+// Check that params are set
+if (HYUNDAI_BLUELINK_EMAIL === "EMAIL") {
+    throw new Error("POLESTAR_EMAIL is not configured");
+}
+if (HYUNDAI_BLUELINK_PASSWORD == "PASSWORD") {
+    throw new Error("POLESTAR_PASSWORD is not configured");
+}
+if (HYUNDAI_BLUELINK_ACCESS_PIN === "VIN") {
+    throw new Error("VIN is not configured");
+}
+if (HYUNDAI_BLUELINK_VIN === "VIN") {
+    throw new Error("VIN is not configured");
+}
+
 const DARK_MODE = Device.isUsingDarkAppearance();
 const DARK_BG_COLOR = "1C3767";
 const LIGHT_BG_COLOR = "FFFFFF";
 
-const HYUNDAI_ICON_LIGHT = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/manufacturers/hyundai-light-mode.png';
-const HYUNDAI_ICON_DARK = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/manufacturers/hyundai-dark-mode.png';
-const HYUNDAI_IONIQ_5 = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/vehicles/2024-Hyundai-IONIQ_5-white-full_color-driver_side_front_quarter.png';
+const HYUNDAI_ICON_LIGHT = 'https://raw.githubusercontent.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/refs/heads/main/bluelink-widget/images/manufacturers/hyundai-light-mode.png';
+const HYUNDAI_ICON_DARK = 'https://raw.githubusercontent.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/refs/heads/main/bluelink-widget/images/manufacturers/hyundai-dark-mode.png';
+const HYUNDAI_IONIQ_5 = 'https://raw.githubusercontent.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/refs/heads/main/bluelink-widget/images/vehicles/2024-Hyundai-IONIQ_5-white-full_color-driver_side_front_quarter.png';
 
 async function loadImage(url: string) {
     const request = new Request(url);
@@ -17,9 +37,9 @@ async function loadImage(url: string) {
 
 // WIP - From Polestar Widget, may need to refactor
 function getBatteryPercentColor(percent: number) {
-    if (percent > 75) {
+    if (percent > 70) {
         return Color.green();
-    } else if (percent > 25) {
+    } else if (percent > 20) {
         return Color.orange();
     } else {
         return Color.red();
@@ -56,15 +76,23 @@ function getBatteryIcon(batteryPercent: number, isConnected: boolean, isCharging
     return { batteryIcon: icon, batteryIconColor: iconColor };
 }
 
+function getLocationPinIcon() {
+    let icon = SFSymbol.named("mappin.and.ellipse");
+    let iconColor = DARK_MODE ? Color.white() : Color.black();
+
+    return { locationPinIcon: icon, locationPinIconColor: iconColor };
+}
+
 // Create Widget
 async function createWidget(batteryData: null, odometerData: null, vehicleInfo: null) {
     const BATTERY_PERCENTAGE = 75;
     const ODOMETER_IN_MILES = 5300;
     const IS_CHARGING = false;
-    const RANGE_IN_MILES = 180;
+    // const RANGE_IN_MILES = 180;
+    const LAST_ONLINE_DATE_TIME = new Date().setHours(-4);  // TEMP
 
     const HYUNDAI_ICON = await loadImage(DARK_MODE ? HYUNDAI_ICON_DARK : HYUNDAI_ICON_LIGHT);
-    const VEHICLE_NAME = 'IONIQ 5';
+    const VEHICLE_NAME = `IONIQ 5`;
 
     const WIDGET = new ListWidget();
     WIDGET.url = 'hyundai-usa://';  // WIP - Don't know if this is to open app??
@@ -80,10 +108,10 @@ async function createWidget(batteryData: null, odometerData: null, vehicleInfo: 
     const TITLE_ELEMENT = TITLE_STACK.addText(VEHICLE_NAME);
     TITLE_ELEMENT.textColor = DARK_MODE ? Color.white() : Color.black();
     TITLE_ELEMENT.textOpacity = 0.7;
-    TITLE_ELEMENT.font = Font.mediumSystemFont(18);
+    TITLE_ELEMENT.font = Font.mediumSystemFont(22);
     TITLE_STACK.addSpacer();
     const ICON_ELEMENT = TITLE_STACK.addImage(HYUNDAI_ICON);
-    ICON_ELEMENT.imageSize = new Size(30, 30);
+    ICON_ELEMENT.imageSize = new Size(35, 35);
     MAIN_STACK.addSpacer();
 
     // Center Row
@@ -91,36 +119,52 @@ async function createWidget(batteryData: null, odometerData: null, vehicleInfo: 
     // Vehicle Image
     const CAR_IMAGE = await loadImage(HYUNDAI_IONIQ_5);
     const CAR_IMAGE_ELEMENT = CONTENT_STACK.addImage(CAR_IMAGE);
-    CAR_IMAGE_ELEMENT.imageSize = new Size(150, 90);
+    CAR_IMAGE_ELEMENT.imageSize = new Size(175, 90);
     CONTENT_STACK.addSpacer();
     // Battery Stack
     const BATTERY_INFO_STACK = CONTENT_STACK.addStack();
     BATTERY_INFO_STACK.layoutVertically();
     BATTERY_INFO_STACK.addSpacer();
     // Range
-    const RANGE_STACK = BATTERY_INFO_STACK.addStack();
+    /**const RANGE_STACK = BATTERY_INFO_STACK.addStack();
     RANGE_STACK.addSpacer();
     const RANGE_TEXT = `${ RANGE_IN_MILES } mi`;
     const RANGE_ELEMENT = RANGE_STACK.addText(RANGE_TEXT);
-    RANGE_ELEMENT.font = Font.mediumSystemFont(20);
+    RANGE_ELEMENT.font = Font.mediumSystemFont(14);
     RANGE_ELEMENT.textColor = DARK_MODE ? Color.white() : Color.black();
     RANGE_ELEMENT.rightAlignText();
-    BATTERY_INFO_STACK.addSpacer();
+    BATTERY_INFO_STACK.addSpacer();*/
     // Battery Percent
     const BATTERY_PERCENTAGE_STACK = BATTERY_INFO_STACK.addStack();
     BATTERY_PERCENTAGE_STACK.addSpacer();
     BATTERY_PERCENTAGE_STACK.centerAlignContent();
     const { batteryIcon, batteryIconColor } = getBatteryIcon(BATTERY_PERCENTAGE, false, IS_CHARGING, false);
     const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(batteryIcon.image);
-    // const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(SFSymbol.named(`battery.75`).image);
-    BATTERY_SYMBOL_ELEMENT.imageSize = new Size(25, 25);
+    BATTERY_SYMBOL_ELEMENT.imageSize = new Size(35, 35);
     BATTERY_SYMBOL_ELEMENT.tintColor = batteryIconColor;
     BATTERY_PERCENTAGE_STACK.addSpacer(8);
     // Battery Text
     const BATTERY_PERCENTAGE_TEXT = BATTERY_PERCENTAGE_STACK.addText(`${ BATTERY_PERCENTAGE }%`);
     BATTERY_PERCENTAGE_TEXT.textColor = getBatteryPercentColor(BATTERY_PERCENTAGE);
-    BATTERY_PERCENTAGE_TEXT.font = Font.boldSystemFont(20);
+    BATTERY_PERCENTAGE_TEXT.font = Font.boldSystemFont(22);
     // Charging State (? Maybe remove ?)
+    BATTERY_INFO_STACK.addSpacer();
+    // Location
+    const LOCATION_STACK = BATTERY_INFO_STACK.addStack();
+    LOCATION_STACK.addSpacer();
+    LOCATION_STACK.centerAlignContent();
+    // Location Pin Icon
+    const { locationPinIcon, locationPinIconColor } = getLocationPinIcon();
+    const LOCATION_PIN_SYMBOL_ELEMENT = LOCATION_STACK.addImage(locationPinIcon.image);
+    LOCATION_PIN_SYMBOL_ELEMENT.imageSize = new Size(15, 15);
+    LOCATION_PIN_SYMBOL_ELEMENT.tintColor = locationPinIconColor;
+    LOCATION_STACK.addSpacer(8);
+    // Location Text
+    const LOCATION_TEXT = `Elk Grove, CA`;
+    const LOCATION_ELEMENT = LOCATION_STACK.addText(LOCATION_TEXT);
+    LOCATION_ELEMENT.font = Font.mediumSystemFont(14);
+    LOCATION_ELEMENT.textColor = DARK_MODE ? Color.white() : Color.black();
+    LOCATION_ELEMENT.rightAlignText();
     BATTERY_INFO_STACK.addSpacer();
 
     // Footer
@@ -128,13 +172,23 @@ async function createWidget(batteryData: null, odometerData: null, vehicleInfo: 
     // Odometer
     const ODOMETER_TEXT = `${ ODOMETER_IN_MILES.toLocaleString() } mi`;
     const ODOMETER_ELEMENT = FOOTER_STACK.addText(ODOMETER_TEXT);
-    ODOMETER_ELEMENT.font = Font.mediumSystemFont(10);
+    ODOMETER_ELEMENT.font = Font.mediumSystemFont(12);
     ODOMETER_ELEMENT.textColor = DARK_MODE ? Color.white() : Color.black();
     ODOMETER_ELEMENT.textOpacity = 0.5;
     ODOMETER_ELEMENT.minimumScaleFactor = 0.5;
     ODOMETER_ELEMENT.leftAlignText();
     FOOTER_STACK.addSpacer();
-    // Last Active Time
+    // Last Active Time    LAST_ONLINE_DATE_TIME
+    const LAST_SEEN_DATE = new Date(LAST_ONLINE_DATE_TIME);
+    // const LAST_SEEN_TEXT = LAST_SEEN_DATE.toLocaleString(); // WIP - Change to just "last hour, or yesterday"
+    const LAST_SEEN_ELEMENT = FOOTER_STACK.addDate(LAST_SEEN_DATE);
+    LAST_SEEN_ELEMENT.font = Font.mediumSystemFont(10);
+    LAST_SEEN_ELEMENT.textOpacity = 0.5;
+    LAST_SEEN_ELEMENT.textColor = DARK_MODE ? Color.white() : Color.black();
+    LAST_SEEN_ELEMENT.minimumScaleFactor = 0.5;
+    LAST_SEEN_ELEMENT.rightAlignText();
+
+    MAIN_STACK.addSpacer();
 
     return WIDGET;
 }
