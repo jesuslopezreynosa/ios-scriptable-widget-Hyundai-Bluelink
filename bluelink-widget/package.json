@@ -1,7 +1,8 @@
 {
   "name": "bluelink-widget",
-  "main": "wip-hyundai-widget.js",
+  "main": "index.js",
   "scripts": {
+    "build": "npm run b wip-hyundai-widget",
     "b": "source ./build.sh; build",
     "bw": "source ./build.sh; build_and_watch"
   },

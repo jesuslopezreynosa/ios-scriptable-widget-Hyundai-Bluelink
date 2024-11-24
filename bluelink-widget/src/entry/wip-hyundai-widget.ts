@@ -3,20 +3,20 @@
  */
 
 const DARK_MODE = Device.isUsingDarkAppearance();
-const DARK_BG_COLOR = "1C3767";    // WIP - Change to Hyundai blue
-const LIGHT_BG_COLOR = "FFFFFF";    // WIP - Change to Hyundai grey from app
+const DARK_BG_COLOR = "1C3767";
+const LIGHT_BG_COLOR = "FFFFFF";
 
-const HYUNDAI_ICON_LIGHT = 'https://s2.ezgif.com/tmp/ezgif-2-2f1a85997f.png';
-const HYUNDAI_ICON_DARK = 'https://s7.ezgif.com/tmp/ezgif-7-5f8417bed4.png';
-const HYUNDAI_IONIQ_5 = 'https://static.tcimg.net/vehicles/primary/c82a51f49a78347c/2024-Hyundai-IONIQ_5-white-full_color-driver_side_front_quarter.png?auto=format&h=450&w=900';
+const HYUNDAI_ICON_LIGHT = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/manufacturers/hyundai-light-mode.png';
+const HYUNDAI_ICON_DARK = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/manufacturers/hyundai-dark-mode.png';
+const HYUNDAI_IONIQ_5 = 'https://github.com/jesuslopezreynosa/ios-scriptable-widget-Hyundai-Bluelink/blob/master/bluelink-widget/images/vehicles/2024-Hyundai-IONIQ_5-white-full_color-driver_side_front_quarter.png';
 
-async function loadImage(url) {
+async function loadImage(url: string) {
     const request = new Request(url);
     return request.loadImage();
 }
 
 // WIP - From Polestar Widget, may need to refactor
-function getBatteryPercentColor(percent) {
+function getBatteryPercentColor(percent: number) {
     if (percent > 75) {
         return Color.green();
     } else if (percent > 25) {
@@ -27,7 +27,7 @@ function getBatteryPercentColor(percent) {
 }
 
 // WIP - From Polestar Widget, may need to refactor
-function getBatteryIcon(batteryPercent, isConnected, isCharging, isChargingDone) {
+function getBatteryIcon(batteryPercent: number, isConnected: boolean, isCharging: boolean, isChargingDone: boolean) {
     let icon;
     let iconColor;
     if (isCharging || isChargingDone) {
@@ -57,7 +57,7 @@ function getBatteryIcon(batteryPercent, isConnected, isCharging, isChargingDone)
 }
 
 // Create Widget
-async function createWidget(batteryData, odometerData, vehicleInfo) {
+async function createWidget(batteryData: null, odometerData: null, vehicleInfo: null) {
     const BATTERY_PERCENTAGE = 75;
     const ODOMETER_IN_MILES = 5300;
     const IS_CHARGING = false;
@@ -110,11 +110,11 @@ async function createWidget(batteryData, odometerData, vehicleInfo) {
     const BATTERY_PERCENTAGE_STACK = BATTERY_INFO_STACK.addStack();
     BATTERY_PERCENTAGE_STACK.addSpacer();
     BATTERY_PERCENTAGE_STACK.centerAlignContent();
-    const { BATTERY_ICON, BATTERY_ICON_COLOUR } = getBatteryIcon(BATTERY_PERCENTAGE, false, IS_CHARGING, false);
-    // const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(BATTERY_ICON.image);
-    const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(SFSymbol.named(`battery.75`).image);
+    const { batteryIcon, batteryIconColor } = getBatteryIcon(BATTERY_PERCENTAGE, false, IS_CHARGING, false);
+    const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(batteryIcon.image);
+    // const BATTERY_SYMBOL_ELEMENT = BATTERY_PERCENTAGE_STACK.addImage(SFSymbol.named(`battery.75`).image);
     BATTERY_SYMBOL_ELEMENT.imageSize = new Size(25, 25);
-    BATTERY_SYMBOL_ELEMENT.tintColor = BATTERY_ICON_COLOUR;
+    BATTERY_SYMBOL_ELEMENT.tintColor = batteryIconColor;
     BATTERY_PERCENTAGE_STACK.addSpacer(8);
     // Battery Text
     const BATTERY_PERCENTAGE_TEXT = BATTERY_PERCENTAGE_STACK.addText(`${ BATTERY_PERCENTAGE }%`);
@@ -148,3 +148,5 @@ if (config.runsInWidget) {
 }
 
 Script.complete();
+
+export { };
